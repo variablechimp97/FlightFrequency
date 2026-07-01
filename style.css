@@ -1,0 +1,586 @@
+/* ── Reset & Variables ──────────────────────────────────────────── */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --b1: #dbeafe; /* lightest blue — short flight  */
+  --b2: #93c5fd; /* light blue   — medium flight  */
+  --b3: #3b82f6; /* blue         — long flight    */
+  --b4: #1e40af; /* dark blue    — very long      */
+  --g0: #f9fafb;
+  --g1: #f3f4f6;
+  --g2: #e5e7eb;
+  --g3: #d1d5db;
+  --g4: #9ca3af;
+  --g5: #6b7280;
+  --g7: #374151;
+  --g9: #111827;
+  --green-bg: #f0fdf4;
+  --green-tx: #166534;
+  --amber-bg: #fef3c7;
+  --amber-tx: #92400e;
+  --red-bg: #fee2e2;
+  --red-tx: #991b1b;
+  --radius: 8px;
+}
+
+body {
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  background: #fff;
+  color: var(--g9);
+  line-height: 1.5;
+  min-height: 100vh;
+}
+
+/* ── Skip Nav ───────────────────────────────────────────────────── */
+.skip {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--b3);
+  color: #fff;
+  padding: 8px 16px;
+  border-radius: 0 0 6px 0;
+  text-decoration: none;
+  font-size: 14px;
+  z-index: 100;
+}
+.skip:focus {
+  top: 0;
+}
+
+/* ── Header ─────────────────────────────────────────────────────── */
+header {
+  border-bottom: 1px solid var(--g2);
+  background: #fff;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.hdr {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 1.25rem;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.add-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--b3);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.add-btn:hover {
+  background: var(--b4);
+}
+.add-btn:focus-visible {
+  outline: 2px solid var(--b3);
+  outline-offset: 2px;
+}
+
+/* ── Layout ─────────────────────────────────────────────────────── */
+main {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 1.75rem 1.25rem;
+}
+
+/* ── Stats ──────────────────────────────────────────────────────── */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 10px;
+  margin-bottom: 1.75rem;
+}
+
+.stat {
+  background: var(--g0);
+  border: 1px solid var(--g2);
+  border-radius: var(--radius);
+  padding: 0.875rem 1rem;
+}
+
+.stat-lbl {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--g5);
+  display: block;
+  margin-bottom: 4px;
+}
+
+.stat-val {
+  font-size: 24px;
+  font-weight: 700;
+}
+
+/* ── PPL Progress ───────────────────────────────────────────────── */
+.prog-wrap {
+  margin-bottom: 1.75rem;
+}
+
+.prog-wrap h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--g7);
+}
+
+.prog-item {
+  margin-bottom: 0.625rem;
+}
+
+.prog-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 13px;
+  color: var(--g7);
+  margin-bottom: 3px;
+}
+.prog-meta small {
+  color: var(--g4);
+}
+
+.prog-track {
+  height: 5px;
+  background: var(--g2);
+  border-radius: 3px;
+  overflow: hidden;
+}
+
+.prog-fill {
+  height: 100%;
+  background: var(--b3);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+
+/* ── Activity Grid ──────────────────────────────────────────────── */
+.grid-wrap {
+  margin-bottom: 1.75rem;
+}
+
+.grid-wrap h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--g7);
+}
+
+.grid-scroll {
+  overflow-x: auto;
+}
+
+.grid-inner {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 728px;
+}
+
+.month-row {
+  position: relative;
+  height: 14px;
+  margin-left: 22px;
+}
+
+.month-lbl {
+  position: absolute;
+  font-size: 11px;
+  color: var(--g4);
+}
+
+.grid-body {
+  display: flex;
+  gap: 2px;
+}
+
+.day-lbls {
+  width: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex-shrink: 0;
+}
+
+.day-lbl {
+  font-size: 11px;
+  color: var(--g4);
+  height: 12px;
+  line-height: 12px;
+  text-align: right;
+}
+
+.weeks {
+  display: flex;
+  gap: 2px;
+}
+.week {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.cell {
+  width: 12px;
+  height: 12px;
+  border-radius: 2px;
+  background: var(--g1);
+  cursor: default;
+  position: relative;
+  flex-shrink: 0;
+}
+.cell.future {
+  opacity: 0;
+  pointer-events: none;
+}
+
+/* Tooltip on hover */
+.cell:hover::after {
+  content: attr(title);
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--g9);
+  color: #fff;
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 4px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* Intensity levels — 4 shades of blue by hours flown */
+.cell[data-l="1"] {
+  background: var(--b1);
+}
+.cell[data-l="2"] {
+  background: var(--b2);
+}
+.cell[data-l="3"] {
+  background: var(--b3);
+}
+.cell[data-l="4"] {
+  background: var(--b4);
+}
+
+.grid-legend {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  justify-content: flex-end;
+  margin-top: 5px;
+  font-size: 11px;
+  color: var(--g4);
+}
+
+.lc {
+  width: 11px;
+  height: 11px;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+/* ── Flights Table ──────────────────────────────────────────────── */
+.log-wrap h2 {
+  font-size: 15px;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: var(--g7);
+}
+
+.empty {
+  text-align: center;
+  padding: 2.5rem 1rem;
+  color: var(--g4);
+  font-size: 14px;
+  border: 2px dashed var(--g2);
+  border-radius: var(--radius);
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--g5);
+  padding: 7px 10px;
+  border-bottom: 1px solid var(--g2);
+}
+
+tbody tr {
+  cursor: pointer;
+  border-bottom: 1px solid var(--g1);
+  transition: background 0.1s;
+}
+tbody tr:hover {
+  background: var(--g0);
+}
+tbody tr:focus-visible {
+  outline: 2px solid var(--b3);
+  outline-offset: -2px;
+}
+
+td {
+  padding: 11px 10px;
+  font-size: 14px;
+}
+
+.badge {
+  display: inline-flex;
+  font-size: 11px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.b-solo {
+  background: var(--b1);
+  color: var(--b4);
+}
+.b-dual {
+  background: var(--green-bg);
+  color: var(--green-tx);
+}
+.b-xc {
+  background: var(--amber-bg);
+  color: var(--amber-tx);
+}
+.b-night {
+  background: #1e1b4b;
+  color: #c7d2fe;
+}
+
+/* ── Modal ──────────────────────────────────────────────────────── */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 50;
+  padding: 1rem;
+}
+.overlay[hidden] {
+  display: none;
+}
+
+.modal {
+  background: #fff;
+  border-radius: 12px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 530px;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+}
+
+.modal-x {
+  position: absolute;
+  top: 0.875rem;
+  right: 0.875rem;
+  background: none;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: var(--g4);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.modal-x:hover {
+  background: var(--g1);
+  color: var(--g7);
+}
+.modal-x:focus-visible {
+  outline: 2px solid var(--b3);
+}
+
+.modal h2 {
+  font-size: 17px;
+  font-weight: 700;
+  margin-bottom: 1.125rem;
+  padding-right: 2rem;
+}
+
+/* ── Form ───────────────────────────────────────────────────────── */
+.fg {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.fi {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.fi.full {
+  grid-column: 1 / -1;
+}
+
+.sdiv {
+  grid-column: 1 / -1;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--g4);
+  padding-top: 4px;
+  border-top: 1px solid var(--g1);
+  margin-top: 2px;
+}
+
+label {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--g7);
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--g3);
+  border-radius: 6px;
+  padding: 7px 10px;
+  font-size: 14px;
+  font-family: inherit;
+  background: #fff;
+  color: var(--g9);
+  transition: border-color 0.15s;
+}
+input:focus,
+select:focus,
+textarea:focus {
+  outline: 2px solid var(--b3);
+  border-color: var(--b3);
+}
+
+textarea {
+  resize: vertical;
+  min-height: 60px;
+}
+
+.form-err {
+  color: var(--red-tx);
+  font-size: 13px;
+  margin-top: 4px;
+  display: none;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 1.125rem;
+}
+
+.btn-c {
+  background: #fff;
+  border: 1px solid var(--g3);
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+  color: var(--g7);
+}
+.btn-c:hover {
+  background: var(--g0);
+}
+
+.btn-s {
+  background: var(--b3);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-s:hover {
+  background: var(--b4);
+}
+
+.btn-d {
+  background: var(--red-bg);
+  color: var(--red-tx);
+  border: none;
+  border-radius: var(--radius);
+  padding: 7px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.btn-d:hover {
+  opacity: 0.85;
+}
+
+/* ── Flight Detail View ─────────────────────────────────────────── */
+.drow {
+  display: flex;
+  justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--g1);
+  font-size: 14px;
+}
+.drow:last-of-type {
+  border-bottom: none;
+}
+
+.dl {
+  color: var(--g5);
+}
+.dv {
+  font-weight: 500;
+  text-align: right;
+}
+.dv.ital {
+  font-style: italic;
+  font-weight: 400;
+  color: var(--g5);
+}
+
+/* ── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .fg {
+    grid-template-columns: 1fr;
+  }
+  .stats {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}

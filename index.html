@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FlyLog — Flight Training Logbook</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <a href="#main" class="skip">Skip to main content</a>
+
+    <header>
+      <div class="hdr">
+        <div class="brand">
+          <span aria-hidden="true">✈</span>
+          FlyLog
+        </div>
+        <button class="add-btn" id="add-btn" aria-label="Log a new flight">
+          <span aria-hidden="true">+</span> Log Flight
+        </button>
+      </div>
+    </header>
+
+    <main id="main">
+      <!-- Flight hour totals -->
+      <section aria-label="Flight hour totals" class="stats">
+        <div class="stat">
+          <span class="stat-lbl">Total Hours</span
+          ><span class="stat-val" id="s-total">0.0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Solo</span
+          ><span class="stat-val" id="s-solo">0.0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Dual</span
+          ><span class="stat-val" id="s-dual">0.0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Cross Country</span
+          ><span class="stat-val" id="s-xc">0.0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Night</span
+          ><span class="stat-val" id="s-night">0.0</span>
+        </div>
+        <div class="stat">
+          <span class="stat-lbl">Landings</span
+          ><span class="stat-val" id="s-ld">0</span>
+        </div>
+      </section>
+
+      <!-- PPL hour requirements -->
+      <section class="prog-wrap" aria-label="PPL minimum hour requirements">
+        <h2>PPL Progress</h2>
+        <div class="prog-item">
+          <div class="prog-meta">
+            <span>Total flight time <small>(40 hr required)</small></span>
+            <span id="pt-lbl">0.0 / 40 hr</span>
+          </div>
+          <div class="prog-track">
+            <div
+              class="prog-fill"
+              id="pt-fill"
+              style="width: 0%"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="40"
+              aria-valuenow="0"
+              aria-label="Total flight time toward PPL"
+            ></div>
+          </div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-meta">
+            <span>Solo time <small>(10 hr required)</small></span>
+            <span id="ps-lbl">0.0 / 10 hr</span>
+          </div>
+          <div class="prog-track">
+            <div
+              class="prog-fill"
+              id="ps-fill"
+              style="width: 0%"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="10"
+              aria-valuenow="0"
+              aria-label="Solo time toward PPL"
+            ></div>
+          </div>
+        </div>
+        <div class="prog-item">
+          <div class="prog-meta">
+            <span>Cross country <small>(5 hr required)</small></span>
+            <span id="px-lbl">0.0 / 5 hr</span>
+          </div>
+          <div class="prog-track">
+            <div
+              class="prog-fill"
+              id="px-fill"
+              style="width: 0%"
+              role="progressbar"
+              aria-valuemin="0"
+              aria-valuemax="5"
+              aria-valuenow="0"
+              aria-label="Cross country time toward PPL"
+            ></div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Activity grid — GitHub-style, shaded by hours flown per day -->
+      <section
+        class="grid-wrap"
+        aria-label="Flight activity over the past year"
+      >
+        <h2>Activity</h2>
+        <div class="grid-scroll">
+          <div class="grid-inner">
+            <div class="month-row" id="month-row" aria-hidden="true"></div>
+            <div class="grid-body">
+              <div class="day-lbls" aria-hidden="true">
+                <div class="day-lbl"></div>
+                <div class="day-lbl">Mon</div>
+                <div class="day-lbl"></div>
+                <div class="day-lbl">Wed</div>
+                <div class="day-lbl"></div>
+                <div class="day-lbl">Fri</div>
+                <div class="day-lbl"></div>
+              </div>
+              <div class="weeks" id="weeks"></div>
+            </div>
+          </div>
+        </div>
+        <div class="grid-legend" aria-hidden="true">
+          <span>Less</span>
+          <div class="lc" style="background: var(--g1)"></div>
+          <div class="lc" style="background: var(--b1)"></div>
+          <div class="lc" style="background: var(--b2)"></div>
+          <div class="lc" style="background: var(--b3)"></div>
+          <div class="lc" style="background: var(--b4)"></div>
+          <span>More</span>
+        </div>
+      </section>
+
+      <!-- Flight log table -->
+      <section class="log-wrap" aria-label="Flight log entries">
+        <h2>Flights</h2>
+        <div id="log"></div>
+      </section>
+    </main>
+
+    <!-- Modal: add flight or view detail -->
+    <div
+      id="overlay"
+      class="overlay"
+      hidden
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-h"
+    >
+      <div class="modal" id="modal">
+        <button class="modal-x" id="modal-x" aria-label="Close dialog">
+          ×
+        </button>
+        <div id="modal-body"></div>
+      </div>
+    </div>
+
+    <script src="script.js"></script>
+  </body>
+</html>
