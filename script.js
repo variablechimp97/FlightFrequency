@@ -28,6 +28,15 @@ function removeFlight(id) {
   save(load().filter((f) => f.id !== id));
 }
 
+function updateFlight(id, data) {
+  const all = load();
+  const idx = all.findIndex((f) => f.id === id);
+  if (idx !== -1) {
+    all[idx] = { id, ...data }; // preserve id, replace everything else
+    save(all);
+  }
+}
+
 /* ────────────────────────────────────────────────────────────────
    HELPERS
    ──────────────────────────────────────────────────────────────── */
@@ -119,12 +128,15 @@ function renderGrid() {
   const WEEKS = 52;
   const STEP = 14; // 12px cell + 2px gap
 
-  // Walk back 52 weeks, then back to the nearest Sunday
-  const start = new Date(today);
-  start.setDate(today.getDate() - WEEKS * 7);
-  while (start.getDay() !== 0) {
-    start.setDate(start.getDate() - 1);
+  // Anchor to the Sunday that starts the CURRENT week, so the rightmost
+  // column always contains today — same behaviour as GitHub's contribution graph.
+  const thisWeekSunday = new Date(today);
+  while (thisWeekSunday.getDay() !== 0) {
+    thisWeekSunday.setDate(thisWeekSunday.getDate() - 1);
   }
+  // Go back 51 more weeks so the current week is column 52 (index 51)
+  const start = new Date(thisWeekSunday);
+  start.setDate(thisWeekSunday.getDate() - (WEEKS - 1) * 7);
 
   const weeksEl = document.getElementById("weeks");
   const monthEl = document.getElementById("month-row");
@@ -132,6 +144,7 @@ function renderGrid() {
   monthEl.innerHTML = "";
 
   let prevMonth = -1;
+  let prevYear = -1;
 
   for (let w = 0; w < WEEKS; w++) {
     const col = document.createElement("div");
@@ -145,7 +158,7 @@ function renderGrid() {
       cell.className = "cell";
 
       if (cur > today) {
-        // Future dates: invisible spacer
+        // Future dates within the current week: invisible spacer
         cell.classList.add("future");
       } else {
         // Use LOCAL date string — this is the fix for the timezone bug
@@ -169,13 +182,28 @@ function renderGrid() {
     }
     weeksEl.appendChild(col);
 
-    // Place a month label at the start of each new month
+    // Month label: show at each new month.
+    // Include a 2-digit year suffix ('25, '26) whenever the year changes —
+    // this satisfies the "system status visible" heuristic since the grid
+    // always spans two calendar years.
     const wd = new Date(start);
     wd.setDate(start.getDate() + w * 7);
     if (wd.getMonth() !== prevMonth) {
       const span = document.createElement("span");
       span.className = "month-lbl";
-      span.textContent = wd.toLocaleString("en-US", { month: "short" });
+
+      const monthName = wd.toLocaleString("en-US", { month: "short" });
+      const yr = wd.getFullYear();
+
+      if (yr !== prevYear) {
+        // Year boundary: show "Jul '25" or "Jan '26"
+        span.textContent = `${monthName} '${String(yr).slice(2)}`;
+        span.style.fontWeight = "600";
+        prevYear = yr;
+      } else {
+        span.textContent = monthName;
+      }
+
       span.style.left = w * STEP + "px";
       monthEl.appendChild(span);
       prevMonth = wd.getMonth();
@@ -439,9 +467,12 @@ function openView(id) {
          </div>`
         : ""
     }
-    <div class="form-actions" style="margin-top:.875rem">
+    <div class="form-actions" style="margin-top:.875rem; justify-content:space-between">
       <button class="btn-d" onclick="confirmDel('${id}')">Delete</button>
-      <button class="btn-c" onclick="closeModal()">Close</button>
+      <div style="display:flex;gap:8px">
+        <button class="btn-c" onclick="openEdit('${id}')">Edit</button>
+        <button class="btn-c" onclick="closeModal()">Close</button>
+      </div>
     </div>`);
 }
 
@@ -451,6 +482,131 @@ function confirmDel(id) {
     closeModal();
     renderAll();
   }
+}
+
+/* ────────────────────────────────────────────────────────────────
+   EDIT FLIGHT MODAL
+   Same form as Add, but pre-filled with existing values.
+   On submit, calls updateFlight() instead of addFlight().
+   ──────────────────────────────────────────────────────────────── */
+function openEdit(id) {
+  const f = load().find((x) => x.id === id);
+  if (!f) return;
+
+  // Helper: returns value string, showing 0 as empty for cleaner number fields
+  const v = (val) => (val ? val : "");
+
+  openModal(`
+    <h2 id="modal-h">Edit Flight</h2>
+    <form id="fl-form" novalidate>
+      <div class="fg">
+        <div class="fi">
+          <label for="fd">Date <abbr title="required">*</abbr></label>
+          <input type="date" id="fd" value="${f.date}" required aria-required="true">
+        </div>
+        <div class="fi">
+          <label for="fa">Aircraft (N-number)</label>
+          <input type="text" id="fa" value="${f.aircraft || ""}" autocomplete="off" style="text-transform:uppercase">
+        </div>
+        <div class="fi">
+          <label for="ffr">From (ICAO)</label>
+          <input type="text" id="ffr" value="${f.from || ""}" maxlength="4" autocomplete="off" style="text-transform:uppercase">
+        </div>
+        <div class="fi">
+          <label for="fto">To (ICAO)</label>
+          <input type="text" id="fto" value="${f.to || ""}" maxlength="4" autocomplete="off" style="text-transform:uppercase">
+        </div>
+
+        <div class="sdiv">Time (hours)</div>
+        <div class="fi">
+          <label for="ft">Total <abbr title="required">*</abbr></label>
+          <input type="number" id="ft" value="${f.totalTime || ""}" min="0.1" max="24" step="0.1" required aria-required="true">
+        </div>
+        <div class="fi">
+          <label for="ftype">Primary Type</label>
+          <select id="ftype">
+            <option value="dual"${f.type === "dual" ? " selected" : ""}>Dual</option>
+            <option value="solo"${f.type === "solo" ? " selected" : ""}>Solo</option>
+            <option value="xc"${f.type === "xc" ? " selected" : ""}>Cross Country</option>
+            <option value="night"${f.type === "night" ? " selected" : ""}>Night</option>
+          </select>
+        </div>
+        <div class="fi">
+          <label for="fdual">Dual received</label>
+          <input type="number" id="fdual" value="${v(f.dual)}" min="0" step="0.1" placeholder="0.0">
+        </div>
+        <div class="fi">
+          <label for="fsolo">Solo</label>
+          <input type="number" id="fsolo" value="${v(f.solo)}" min="0" step="0.1" placeholder="0.0">
+        </div>
+        <div class="fi">
+          <label for="fxc">Cross country</label>
+          <input type="number" id="fxc" value="${v(f.crossCountry)}" min="0" step="0.1" placeholder="0.0">
+        </div>
+        <div class="fi">
+          <label for="fnight">Night</label>
+          <input type="number" id="fnight" value="${v(f.night)}" min="0" step="0.1" placeholder="0.0">
+        </div>
+
+        <div class="sdiv">Landings</div>
+        <div class="fi">
+          <label for="fld">Day landings</label>
+          <input type="number" id="fld" value="${v(f.landingsDay)}" min="0" step="1" placeholder="0">
+        </div>
+        <div class="fi">
+          <label for="fln">Night landings</label>
+          <input type="number" id="fln" value="${v(f.landingsNight)}" min="0" step="1" placeholder="0">
+        </div>
+        <div class="fi full">
+          <label for="frm">Remarks</label>
+          <textarea id="frm">${f.remarks || ""}</textarea>
+        </div>
+      </div>
+
+      <div id="fl-err" role="alert" class="form-err"></div>
+
+      <div class="form-actions">
+        <button type="button" class="btn-c" onclick="closeModal()">Cancel</button>
+        <button type="submit" class="btn-s">Update Flight</button>
+      </div>
+    </form>`);
+
+  document.getElementById("fl-form").addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const errEl = document.getElementById("fl-err");
+    const date = document.getElementById("fd").value;
+    const total = +document.getElementById("ft").value;
+
+    if (!date || !total || total <= 0) {
+      errEl.textContent = "Date and Total Time are required.";
+      errEl.style.display = "block";
+      (date
+        ? document.getElementById("ft")
+        : document.getElementById("fd")
+      ).focus();
+      return;
+    }
+
+    updateFlight(id, {
+      date,
+      aircraft: document.getElementById("fa").value.trim().toUpperCase(),
+      from: document.getElementById("ffr").value.trim().toUpperCase(),
+      to: document.getElementById("fto").value.trim().toUpperCase(),
+      type: document.getElementById("ftype").value,
+      totalTime: total,
+      dual: +document.getElementById("fdual").value || 0,
+      solo: +document.getElementById("fsolo").value || 0,
+      crossCountry: +document.getElementById("fxc").value || 0,
+      night: +document.getElementById("fnight").value || 0,
+      landingsDay: +document.getElementById("fld").value || 0,
+      landingsNight: +document.getElementById("fln").value || 0,
+      remarks: document.getElementById("frm").value.trim(),
+    });
+
+    closeModal();
+    renderAll();
+  });
 }
 
 /* ────────────────────────────────────────────────────────────────
